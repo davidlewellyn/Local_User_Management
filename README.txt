@@ -147,3 +147,41 @@ to manage the user accounts. This script provides three main areas of applicatio
   			  utilizing the usermod command. The generate password is then saved to
   			  a log file created in tmp.
   			  
+  	    2. Set expiration date
+  	    	- Prior to unlocking and account the expiration date must be set. This option
+  	    	   will prompt the admin for a YYYY MM DD that will be the new expiration date
+  	    	   set for the account. This is achieved by concatenating the input from the 
+  	    	   admin and using: chage -E <expire_date> 
+  	    	   
+  	    3. Unlock Account
+  	    	- This option is in place to unlock the users account if they had improperly
+  	    	  entered a password of if the account is still locked after the expire date
+  	    	  has been changed. After which the account is unlocked using the command: 
+  	    	  usermod --unlock <username>
+  	    	  
+  	    4. Lock Account
+  	    	- In the event that an account needs to be locked prior to the time set by the
+  	    	  script or if it passed through the account-admin.py parameters without an
+  	    	  issue then the admin can lock the account manually through this selection.
+  	    	  After selecting this option the user's account will be locked using the 
+  	    	  command: usermod --lock <username>
+  	
+   - Delete User
+   
+     Upon selecting this the admin will be prompted to enter the username of the account
+  	 which will then be validated against the entries found in the /etc/passwd file. Then
+  	 the admin will be met with the following choices.
+  	 
+  	 	1. Delete User account
+  	 		
+  	 		- This option will simply remove the user's information for the shadow and 
+  	 		   passwd databases. The home folders for these users will still be intact.
+  	 		   
+  	 	2. Delete User Recursively
+  	 	
+  	 		- This option is will not only remove the user's information form the shadow
+  	 		  and passwd databases, but will also delete the user's home directory as
+  	 		  well.
+  	 		  
+Please enjoy using this application, and if you feel there are any improvement that can be 
+made please feel free to comment on the repository.
