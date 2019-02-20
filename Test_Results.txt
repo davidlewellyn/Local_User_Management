@@ -1,0 +1,45 @@
+Author: David Lewellyn
+Document: Test_Resulst.txt
+
+Purpose: This document will serve and and parameter outline for the 
+application files:
+
+*account-admin.py
+*userAdmin.sh
+
+This will ensure that the application will meet all the needed outlined in 
+the project requirements. Below are the outlined targets for each part of the application, and 
+the results of these test will be contained in the file Test_Results.txt
+
+1. Testing account-admin.py
+
+Test parameters:
+
+a. Does the application report users that don't have password?
+	
+
+b. Does the application report all expired account?
+
+
+c. Does the application report the expiration date/time for all accounts?
+
+
+2. Testing userAdmin.sh
+
+Test parameters:
+
+a. Does the application allow you to lock and unlock a user account?
+
+b. Does the application allow you to change the Expiration Date on an account?
+
+
+c. Does the application allow you add a user to the system?
+
+*Extra functionality outside Scope of Work
+
+d. Does the application allow you to remove a user account?
+
+
+
+
+
