@@ -16,12 +16,187 @@ the results of these test will be contained in the file Test_Results.txt
 Test parameters:
 
 a. Does the application report users that don't have password?
-	
 
+Pre-Conditions:
+
+==========================================================================
+                        User Accounts
+==========================================================================
+User       UID    Home Dir         Status     Expiration
+---------- ------ ---------------- ---------- --------------------
+dlewellyn  1000   /home/dlewellyn             2019-06-30 20:00:00
+==========================================================================
+                  User Account Report
+==========================================================================
+
+Total User Accounts: 1
+
+Account Locked: 0
+
+Accounts without Expiration Dates: 0
+
+Expired Accounts: 0
+
+Changes:
+Added 1 User account:
+
+dlewellyn@ubuntu:~$ sudo useradd lewellyn -c 'My Test Account'
+
+Verify:
+
+~# grep -w lewellyn /etc/passwd && grep -w lewellyn /etc/shadow
+lewellyn:x:1001:1001:My Test Account:/home/lewellyn:/bin/sh
+lewellyn:!:17947:0:99999:7:::
+
+As we can see the account is already locked.
+
+The account has database entries yet has no password or expiration date.
+
+Post-Conditions
+
+==========================================================================
+                        User Accounts
+==========================================================================
+User       UID    Home Dir         Status     Expiration
+---------- ------ ---------------- ---------- --------------------
+dlewellyn  1000   /home/dlewellyn             2019-06-30 20:00:00
+lewellyn   1001   /home/lewellyn   Locked     Date not Set
+==========================================================================
+                  User Account Report
+==========================================================================
+
+Total User Accounts: 2
+
+Account Locked: 1
+lewellyn
+
+Accounts without Expiration Dates: 1
+lewellyn
+
+Expired Accounts: 0
+
+Results: Success
+
+If the used account does not have a password or expiration date it will lock 
+the account and report it.
+	
 b. Does the application report all expired account?
+
+To verify this we will created a user account that has a password but no expiration date: 
+
+~# useradd -c 'Another Test Account' -p ucantseeme joncena
+~# grep -w joncena /etc/shadow && grep -w joncena /etc/passwd
+joncena:ucantseeme:17947:0:99999:7:::
+joncena:x:1002:1002:Another Test Account:/home/joncena:/bin/sh
+
+Results:
+
+==========================================================================
+                        User Accounts
+==========================================================================
+User       UID    Home Dir         Status     Expiration
+---------- ------ ---------------- ---------- --------------------
+dlewellyn  1000   /home/dlewellyn             2019-06-30 20:00:00
+lewellyn   1001   /home/lewellyn   Locked     Date not Set
+joncena    1002   /home/joncena    Locked     Date not Set
+==========================================================================
+                  User Account Report
+==========================================================================
+
+Total User Accounts: 3
+
+Account Locked: 1
+lewellyn
+
+Accounts without Expiration Dates: 2
+lewellyn
+joncena
+
+Expired Accounts: 0
+
+Success. Ass you can see the application identified and expired account and 
+locked it. Verified.
+
+grep -w joncena /etc/shadow && grep -w joncena /etc/passwd
+joncena:!ucantseeme:17947:0:99999:7:::
+joncena:x:1002:1002:Another Test Account:/home/joncena:/bin/sh
 
 
 c. Does the application report the expiration date/time for all accounts?
+
+To test this I will create an account that has a password and expiration date
+
+~# useradd -c 'The Nature Boy' -p woooooooooo -e 2020-10-31 rickflair
+
+grep -w rickflair /etc/shadow && grep -w rickflair /etc/passwd
+rickflair:woooooooooo:17947:0:99999:7::18566:
+rickflair:x:1003:1003:The Nature Boy:/home/rickflair:/bin/sh
+
+Expiration date is set for a Epoch of 18566
+
+Results:
+
+The time calcualtions isn't quite perfect but its CE.
+
+==========================================================================
+                        User Accounts
+==========================================================================
+User       UID    Home Dir         Status     Expiration
+---------- ------ ---------------- ---------- --------------------
+dlewellyn  1000   /home/dlewellyn             2019-06-30 20:00:00
+lewellyn   1001   /home/lewellyn   Locked     Date not Set
+joncena    1002   /home/joncena    Locked     Date not Set
+rickflair  1003   /home/rickflair             2020-10-30 20:00:00
+==========================================================================
+                  User Account Report
+==========================================================================
+
+Total User Accounts: 4
+
+Account Locked: 1
+lewellyn
+
+Accounts without Expiration Dates: 2
+lewellyn
+joncena
+
+Expired Accounts: 0
+
+==========================================================================
+                      System Accounts
+==========================================================================
+Account              UID    Directory                   Status     Expiration
+-------------------- ------ --------------------------- ---------- ----------
+root                 0      /root                                  Date not Set
+daemon               1      /usr/sbin                              Date not Set
+bin                  2      /bin                                   Date not Set
+sys                  3      /dev                                   Date not Set
+sync                 4      /bin                                   Date not Set
+games                5      /usr/games                             Date not Set
+man                  6      /var/cache/man                         Date not Set
+lp                   7      /var/spool/lpd                         Date not Set
+mail                 8      /var/mail                              Date not Set
+news                 9      /var/spool/news                        Date not Set
+uucp                 10     /var/spool/uucp                        Date not Set
+proxy                13     /bin                                   Date not Set
+www-data             33     /var/www                               Date not Set
+backup               34     /var/backups                           Date not Set
+list                 38     /var/list                              Date not Set
+irc                  39     /var/run/ircd                          Date not Set
+gnats                41     /var/lib/gnats                         Date not Set
+systemd-network      100    /run/systemd/netif                     Date not Set
+systemd-resolve      101    /run/systemd/resolve                   Date not Set
+syslog               102    /home/syslog                           Date not Set
+messagebus           103    /nonexistent                           Date not Set
+_apt                 104    /nonexistent                           Date not Set
+uuidd                105    /run/uuidd                             Date not Set
+avahi-autoipd        106    /var/lib/avahi-autoipd                 Date not Set
+usbmux               107    /var/lib/usbmux                        Date not Set
+<-- Redacted for Brevity -->
+
+We don't touch that system level accouts. Only report
+
+Qualified Success.
 
 
 2. Testing userAdmin.sh
@@ -30,15 +205,258 @@ Test parameters:
 
 a. Does the application allow you to lock and unlock a user account?
 
+For this section I will be using the same accounts as above. This makes for less cruft to sort through
+
+Since we know the account 'rickflair' is unlocked we will user that in the demonstration.
+
+Pre Conditions:
+
+ubuntu:~# grep -w rickflair /etc/shadow && grep -w rickflair /etc/passwd
+rickflair:woooooooooo:17947:0:99999:7::18566:
+rickflair:x:1003:1003:The Nature Boy:/home/rickflair:/bin/sh
+
+@ubuntu:~$ sudo ./userAdmin.sh 
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+2
+Please enter Username[Enter]: rickflair
+What would like to do?:
+(1)Generate a New Password
+(2)Set Expiration Date
+(3)Unlock
+(4)Lock
+(5)Main
+4
+Locking account: rickflair
+
+Post Condition:
+
+~# grep -w rickflair /etc/shadow && grep -w rickflair /etc/passwd
+rickflair:!woooooooooo:17947:0:99999:7::18566:
+rickflair:x:1003:1003:The Nature Boy:/home/rickflair:/bin/sh
+
+As you can see the account is now locked. Now we will unlock the same Account.
+
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+2
+Please enter Username[Enter]: rickflair
+What would like to do?:
+(1)Generate a New Password
+(2)Set Expiration Date
+(3)Unlock
+(4)Lock
+(5)Main
+3
+Unlocking account: rickflair
+
+Post Condition:
+
+~# grep -w rickflair /etc/shadow && grep -w rickflair /etc/passwd
+rickflair:woooooooooo:17947:0:99999:7::18566:
+rickflair:x:1003:1003:The Nature Boy:/home/rickflair:/bin/sh
+
+He is now unlocked.
+
 b. Does the application allow you to change the Expiration Date on an account?
 
+For this test the account 'joncena' will be used since it is reported as locked
+with no exiration date.
+
+Pre - Conditions:
+
+joncena:!ucantseeme:17947:0:99999:7:::
+joncena:x:1002:1002:Another Test Account:/home/joncena:/bin/sh
+
+Please enter Username[Enter]: joncena
+What would like to do?:
+(1)Generate a New Password
+(2)Set Expiration Date
+(3)Unlock
+(4)Lock
+(5)Main
+2
+Set a new expiration date for joncena
+Enter YYYY: 
+2020
+Enter MM: 
+12
+Enter DD: 
+01
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+2
+Please enter Username[Enter]: joncena
+What would like to do?:
+(1)Generate a New Password
+(2)Set Expiration Date
+(3)Unlock
+(4)Lock
+(5)Main
+3
+Unlocking account: joncena
+
+Post Conditions:
+
+~# grep -w joncena /etc/shadow && grep -w joncena /etc/passwd
+joncena:ucantseeme:17947:0:99999:7::18597:
+joncena:x:1002:1002:Another Test Account:/home/joncena:/bin/sh
+
+As you can see 'joncena' is now unlocked and has a Epoch time set to: 18597
 
 c. Does the application allow you add a user to the system?
+
+Pre-conditions: Since we have only added 3 account they will be at the end of the /etc/passwd file:
+
+tail -n 4 /etc/passwd
+dlewellyn:x:1000:1000:DAVID LEWELLYN,,,:/home/dlewellyn:/bin/bash
+lewellyn:x:1001:1001:My Test Account:/home/lewellyn:/bin/sh
+joncena:x:1002:1002:Another Test Account:/home/joncena:/bin/sh
+rickflair:x:1003:1003:The Nature Boy:/home/rickflair:/bin/sh
+
+sudo ./userAdmin.sh 
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+1
+Please enter First Name[ENTER]: Hulk
+Please enter Last Name[ENTER]: Hogan
+Please enter Username[ENTER]: brother
+
+Checking Availability.
+▇▇▇| 100%
+Username: brother is valid.
+Please enter the home directory.
+Example: /dev/brother
+Default: /home/brother
+[Enter]: /wwe/brother
+
+Directory: /wwe/brother does not exist.
+Would you like to create it?[Y/N]
+y
+
+Directory /wwe/brother created
+
+Committing User Information
+▇▇▇▇| 100%
+ Setting permissions for /wwe/brother
+▇▇▇▇| 100%
+Generating log file in: /tmp/
+▇▇▇▇▇| 100%
+
+Log file created in /tmp
+
+Account: brother
+Home Directory: /wwe/brother
+Default shell: /bin/sh
+ Owner: Hulk Hogan
+Last password change                                    : Feb 20, 2019
+Password expires                                        : never
+Password inactive                                       : never
+Account expires                                         : Feb 20, 2019
+Minimum number of days between password change          : 0
+Maximum number of days between password change          : 99999
+Number of days of warning before password expires       : 7
+
+Password: MmNhYjNmMT
+The account is currently locked:
+Pending user login
+ 
+Post Condition:
+
+~# grep -w brother /etc/shadow && grep -w brother /etc/passwd
+brother:!MmNhYjNmMT:17947:0:99999:7:::
+brother:x:1004:1004:Hulk Hogan:/wwe/brother:/bin/sh
+
+Since the account is locked by default we simply have to use the unlock feature
+when the user logs in and this is where they will set thier password.
 
 *Extra functionality outside Scope of Work
 
 d. Does the application allow you to remove a user account?
 
+Pre Conditions:
+
+tail -n 4 /etc/passwd
+lewellyn:x:1001:1001:My Test Account:/home/lewellyn:/bin/sh
+joncena:x:1002:1002:Another Test Account:/home/joncena:/bin/sh
+rickflair:x:1003:1003:The Nature Boy:/home/rickflair:/bin/sh
+brother:x:1004:1004:Hulk Hogan:/wwe/brother:/bin/sh
+
+ sudo ./userAdmin.sh 
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+3
+Please enter Username[ENTER]: brother
+Is this a full(F) user delete or just the (L)local account?
+(F)Removes Home Directories and Mail Tokens
+(L)Local Delete only.
+f
+userdel: brother mail spool (/var/mail/brother) not found
+A recursive delete of brother has occured
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+3
+Please enter Username[ENTER]: rickflair
+Is this a full(F) user delete or just the (L)local account?
+(F)Removes Home Directories and Mail Tokens
+(L)Local Delete only.
+f
+userdel: rickflair mail spool (/var/mail/rickflair) not found
+A recursive delete of rickflair has occured
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+3
+Please enter Username[ENTER]: joncena
+Is this a full(F) user delete or just the (L)local account?
+(F)Removes Home Directories and Mail Tokens
+(L)Local Delete only.
+f
+userdel: joncena mail spool (/var/mail/joncena) not found
+userdel: joncena home directory (/home/joncena) not found
+A recursive delete of joncena has occured
+Welcome: root
+Please select from the following:
+(1) Add User
+(2) Modify Existing User
+(3) Delete User
+(4) Quit
+4
+Goodbye
+
+Post Conditions
+
+tail -n 4 /etc/passwd
+gnome-initial-setup:x:120:65534::/run/gnome-initial-setup/:/bin/false
+gdm:x:121:125:Gnome Display Manager:/var/lib/gdm3:/bin/false
+dlewellyn:x:1000:1000:DAVID LEWELLYN,,,:/home/dlewellyn:/bin/bash
+lewellyn:x:1001:1001:My Test Account:/home/lewellyn:/bin/sh
 
 
 

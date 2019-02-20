@@ -182,9 +182,11 @@ case $answer in
 
 	L|l) userdel $user  >> $logdir$timestamp"_"$user
 	     printf "Local account: %s has been deleted\n" "$user"
+	     menu
 	     ;;
 	F|f) userdel -r $user >> $logdir$timestamp"_"$user
    	     printf "A recursive delete of %s has occured\n" "$user"
+   	     menu
 	     ;;
 	*) printf "Invalid choice. No acction Occured."
 	   
@@ -201,13 +203,13 @@ function checkuid {
 	if [ "$user" == "root" ]
 	then
 		printf "\nFailure: User %s cannot be altered\n" "$user"
-  		exit 255
+  		menu
 	fi
 	# be sure to use the -w with grep for an exact match
 	user=$(grep -w $user /etc/passwd | cut -d: -f1)
 	if [ -z "$user" ]
 	then
-		printf "\nUser: %s does not exist. Exiting\n" "$1" 
+		printf "\nUser: %s does not exist.\n Exiting\n" "$1" 
 		menu
 	fi
 }
@@ -216,7 +218,7 @@ function validate {
 	user=$1
 	if [ "$user" == "root" ]
 	then
-		printf "\nFailure: Did you seriously try to create a UID named: %s...you deserve this\" "$user"
+		printf "\nFailure: Did you seriously try to create a UID named: %s...you deserve this\n" "$user"
 		#chage -l $(whoami)
 		#logout  # This would be just pure evil, but if someone attemted this I would...very quickly
 		exit 255
@@ -331,7 +333,7 @@ progress-bar() {
 
 function menu {
 
-printf "Welcome: %s\nPlease select from the following:\n(1) Add User\n(2) Modify Existing User\n(3) Delete User\n(4) Quit\n"  "$admin"  
+printf "\nWelcome: %s\nPlease select from the following:\n(1) Add User\n(2) Modify Existing User\n(3) Delete User\n(4) Quit\n"  "$admin"  
 #----Greeter-----
 # I am opening up with a case statement to make the 
 # choices very narrow in order to take the play
@@ -366,7 +368,7 @@ admin=$(whoami)
 
 if [ $# -ne 0 ]
 then 
-   printf "Script: %s\nVersion: %s\nAuthor: %s\nUsage: ./userAdmin.sh -No Arguments-\n" "$SCRIPT" "$VERSION" "$AUTHOR"
+   printf "\nScript: %s\nVersion: %s\nAuthor: %s\nUsage: ./userAdmin.sh -No Arguments-\n" "$SCRIPT" "$VERSION" "$AUTHOR"
    exit 255 
 fi
 

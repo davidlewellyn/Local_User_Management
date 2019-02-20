@@ -161,18 +161,14 @@ for u in users:
 	usernoexpireList.insert(usernoexpirecount, u.pw_name)
         usernoexpirecount += 1
         status = lockAccount(u.pw_name)
-        userlocksList.insert(userlockscount, u.pw_name)
-        userlockscount += 1
     #If the account is expired. The account is locked
     if expire == "Expired":
 	userexpireList.insert(userexpirecount, u.pw_name)
         userexpirecount += 1
 	status = lockAccount(u.pw_name)
-	userlocksList.insert(userlockscount, u.pw_name)
-        userlockscount += 1
     if acct.sp_pwd == "!":
         userlocksList.insert(userlockscount, u.pw_name)
-        status = "Locked by Admin"
+        status = "Locked"
         userlockscount += 1
     usercount += 1
     print fmt % (ulength, u.pw_name, uilen , u.pw_uid, hlength, u.pw_dir, statlen,  status, expire)
