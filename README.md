@@ -8,7 +8,8 @@ Contents of this repo
 - Test_Results.txt: This file contains the results of the tests conducted.
   
  # Purpose
- This application was driven by the academic requirements for a class assignment. Maintaining a source of version controll allows me the ability to roll back to a previous working state, and to also improve upon this work at a later time if needed.
+ This application was driven by the academic requirements for a class assignment. Maintaining a source of version controll  allows me the ability to roll back to a previous working state, and to also improve upon this work at a later time if needed.
+ Please keep in mind that this is for an academic assignment, and that this has not been completely vetted for any commercial use.  
  
  # Requirments 
 Create a script that can be run from the crontab or the command line that helps you administer accounts. The
