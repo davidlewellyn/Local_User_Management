@@ -1,4 +1,4 @@
-# user-nuggets
+# Local User Management
 Contents of this repo
 - README.txt: This is a set of user intructions on how to use the application.
 - account-admin.py: A Python driven application that will identify local accounts.
